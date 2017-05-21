@@ -22,6 +22,7 @@ router.get('/help', function(req, res, next) {
 router.param('quizId', quizController.load);
 
 
+
 // Definición de rutas de /quizzes
 router.get('/quizzes',                     quizController.index);
 router.get('/quizzes/:quizId(\\d+)',       quizController.show);
@@ -33,6 +34,10 @@ router.delete('/quizzes/:quizId(\\d+)',    quizController.destroy);
 
 router.get('/quizzes/:quizId(\\d+)/play',  quizController.play);
 router.get('/quizzes/:quizId(\\d+)/check', quizController.check);
+
+//Definicion de rutas de random
+router.get('/quizzes/randomplay',          quizController.randomplay);
+router.get('/quizzes/randomcheck/:quizId(\\d+)' , quizController.randomcheck);
 
 
 module.exports = router;
