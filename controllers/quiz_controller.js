@@ -173,60 +173,10 @@ exports.play = function (req, res, next) {
     });
 };
 
-// GET /quizzes/randomplay
-exports.randomplay = function (req, res, next) {
 
-    if (!req.session.respondidas){req.session.respondidas = [-1];}//si no hay => crea con respondidas vacia
-    //if (!req.session.score) {req.session.score = 0;}// si no hay puntuacion anterior => puntuacion a 0
-    //var puntuacion = req.session.score;
-    if (req.session.respondidas.length == req.totalQuizCount) { // si ha respondido todas 
-        var acertadas = req.session.respondidas.length-1;
-        req.session.respondidas=[-1]; // reinicio las preguntas 
-        res.render('quizzes/random_nomore', { score: acertadas  //se le envia a la pagina random_nomore
-    }); // aun no se han respondido todas
-}else{
-    var Id = Math.floor(Math.random()*req.totalQuizCount+1);
-    while {(req.session.respondidas.includes(Id) && req.session.respondidas.length <= req.totalQuizCount)// mientras Id este respondido 
-        Id = Math.floor(Math.random() * (req.totalQuizCount) + 1);}// si esta entre las respondidas cogemos otro aleatorio id 
 
-    req.session.respondidas.push(Id); // metemos Id
-    models.Quiz.findById(Id)
-     .then(function (quiz) {
-        if (quiz) {
-            req.quiz = quiz;
-            var acertadas = req.session.respondidas.length-1;
-             res.render('quizzes/random_play', {
-                 quiz: req.quiz, 
-                 answer: '',
-                 score: acertadas
-             });
-             next();
-         } else {
-             throw new Error('No existe ese Id');
-         }
-     })
-     .catch(function (error) {
-         next(error);
-    });
-    }
-    };
-// GET /quizzes/randomcheck/:quizId?answer=respuesta
-exports.randomcheck  = function (req, res, next) {
-    var respuesta = req.query.answer || "";//respuesta es igual a la answer o un string vacio
-    var acierto = respuesta.toLowerCase().trim() === req.quiz.answer.toLowerCase().trim(); // comparamos la respuesta dada con la correcta
-    var acertadas= req.session.respondidas.length-1;
-if (acierto){// acierto es un booleano 
-req.session.respondidas.push(req.quiz.id);// si es correcta meto esta quiz en el array de las completadas
-acertadas++; // sumo uno a acertadas
-} else {
-    req.session.respondidas=[-1] // reinicio la array con las respondidas
-}
-res.render('quizzes/random_result', {
-        score: acertadas,
-        result: acierto,
-       answer: respuesta
-   });
-};
+
+
 // GET /quizzes/:quizId/check
 exports.check = function (req, res, next) {
 
@@ -240,3 +190,55 @@ exports.check = function (req, res, next) {
         answer: answer
     });
 };
+// GET /quizzes/randomcheck/:quizId(\\d+)
+exports.randomCheck = function(req,res,next) {
+  req.session.quizzesId = req.session.quizzesId || [];
+  
+  result = req.query.answer.toLowerCase().trim() == req.quiz.answer.toLowerCase().trim();//comparamos la respuesta con la respuesta correcta
+  if (result) {
+    req.session.quizzesId.push(req.quiz.id);// si esta bien lo añadimos a done
+  } else {
+    req.session.quizzesId = [];// sino reniciamos
+  }
+
+  score = req.session.quizzesId.length;
+  res.render('quizzes/random_result.ejs', {
+    score: score,
+    answer: req.query.answer,
+    result: result
+  })
+};
+// GET /quizzes/randomplay
+exports.random = function(req,res,next) {
+  quizzesId = req.session.quizzesId || [];
+  if(quizzesId.length == 0) {
+    quizzesDone = [0];
+  } else {
+    quizzesDone = quizzesId;//un array con los quizzes ya pasados 
+  }
+
+  models.Quiz.findAll({
+    where: {
+      id: {
+        $notIn: quizzesDone// los quizzes que no estan en los quizzes hechos 
+      }
+    }
+  }).then(function(quizzes) {
+    if(quizzes.length > 0) {// si hay alguno 
+      
+      quiz = quizzes[Math.floor(Math.random()*quizzes.length)].dataValues;// escogo uno aleatorio
+
+      res.render('quizzes/random_play', {//cargo random play
+        score: quizzesId.length,
+        quiz: quiz
+      });
+    } else {
+      req.session.quizzesId = [];// sino he acabado y cargo random none
+      res.render('quizzes/random_none', {
+        score: quizzesId.length
+      });
+    }
+  });
+};
+
+
