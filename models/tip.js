@@ -10,6 +10,9 @@ module.exports = function (sequelize, DataTypes) {
             accepted: {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false
+            },
+            AuthorId: { type: DataTypes.INTEGER,
+                validate: -1
             }
         });
 };

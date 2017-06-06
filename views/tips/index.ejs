@@ -1,37 +1,48 @@
 
-
-
 <ul>
+    
     <% for (var i in tips) { %>
-        <% var tip = tips[i]; %>
+
+    <% var tip = tips[i]; %>
+    <% var accepted = tip.accepted; %>
+    <% var isAdmin = session.user && session.user.isAdmin; %>
+    <% var isQuizAuthor = session.user && quizAuthorId && quizAuthorId === session.user.id; %>
+    <% var isTipAuthor = session.user && tip.AuthorId && tip.AuthorId === session.user.id; %>
+
+    <% if (accepted || isAdmin || isQuizAuthor) { %>
 
         <li>
 
-            <% if (tip.accepted ||
-                    (session.user && (session.user.isAdmin || (quizAuthorId && quizAuthorId === session.user.id)))) { %>
+            <%= tip.text %>
 
-                <%= tip.text %>
+           <div class="right">
 
-<% for (var j in users) { %>
-  <% if (users[j].id == tip.AuthorId) { %>
-                <span id="author"><%= users[j].username %></span>
-  <% } %>
-<% } %>
-            <% } %>
+           <small> (by <span id="autor"><%= tip.Author ? tip.Author.username : "Anómino" %></span>) </small>
 
-            <% if (!tip.accepted &&
-                    (session.user && (session.user.isAdmin || (quizAuthorId && quizAuthorId === session.user.id)))) { %>
+          </div>
 
-                <a href="/quizzes/<%= quizId %>/tips/<%= tip.id %>/accept?_method=PUT"><button>Aceptar</button></a>
+     <% if (!accepted && (isAdmin || isQuizAuthor )) { %>
 
-            <% } %>
+                <a href="/quizzes/<%= quizId %>/tips/<%= tip.id %>/accept?_method=PUT">
 
-            <% if ((session.user && (session.user.isAdmin || (quizAuthorId && quizAuthorId === session.user.id)))) { %>
+                        <button>Aceptar</button>
 
-                <a href="/quizzes/<%= quizId %>/tips/<%= tip.id %>?_method=DELETE"><button>Borrar</button></a>
+                </a>
 
             <% } %>
-            
+
+     <% if (isAdmin || isTipAuthor) { %>
+
+                <a href="/quizzes/<%= quizId %>/tips/<%= tip.id %>?_method=DELETE">
+
+                        <button>Borrar</button>
+
+                </a>
+
+            <% } %>
+
         </li>
+        
+    <% } %>
     <% } %>
 </ul>

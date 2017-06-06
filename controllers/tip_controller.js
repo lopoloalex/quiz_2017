@@ -2,10 +2,14 @@ var models = require('../models');
 var Sequelize = require('sequelize');
 
 
+
 // Autoload la pista asociado a :tipId
 exports.load = function (req, res, next, tipId) {
 
-    models.Tip.findById(tipId)
+    models.Tip.findById(tipId, { include: [
+            {model: models.User, as: 'Author'}
+        ]
+})
     .then(function (tip) {
         if (tip) {
             req.tip = tip;
@@ -18,6 +22,7 @@ exports.load = function (req, res, next, tipId) {
         next(error);
     });
 };
+
 
 
 // GET /quizzes/:quizId/tips/new
@@ -44,9 +49,9 @@ exports.create = function (req, res, next) {
             AuthorId: req.session.user.id
         });
 
-    tip.save()
+        tip.save({fields: ["text", "QuizId", "AuthorId"]})
     .then(function (tip) {
-        req.flash('success', 'Pista creado con éxito.');
+        req.flash('success', 'Pista creada.');
 
         res.redirect("back");
         // res.redirect('/quizzes/' + req.quiz.id);
