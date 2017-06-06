@@ -102,7 +102,13 @@ exports.index = function (req, res, next) {
 // GET /quizzes/:quizId
 exports.show = function (req, res, next) {
 
-    res.render('quizzes/show', {quiz: req.quiz});
+    models.User.findAll()
+    .then(function(users) {
+        res.render('quizzes/show', {
+            quiz: req.quiz,
+            users: users
+        });
+    });
 };
 
 
@@ -197,17 +203,24 @@ exports.destroy = function (req, res, next) {
 };
 
 
+
+
+
+
 // GET /quizzes/:quizId/play
 exports.play = function (req, res, next) {
 
     var answer = req.query.answer || '';
 
-    res.render('quizzes/play', {
-        quiz: req.quiz,
-        answer: answer
+    models.User.findAll()
+    .then(function(users) {
+        res.render('quizzes/play', {
+            quiz: req.quiz,
+            answer: answer,
+            users: users
+        });
     });
 };
-
 
 
 

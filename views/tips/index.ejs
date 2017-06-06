@@ -1,5 +1,6 @@
 
 
+
 <ul>
     <% for (var i in tips) { %>
         <% var tip = tips[i]; %>
@@ -11,6 +12,11 @@
 
                 <%= tip.text %>
 
+<% for (var j in users) { %>
+  <% if (users[j].id == tip.AuthorId) { %>
+                <span id="author"><%= users[j].username %></span>
+  <% } %>
+<% } %>
             <% } %>
 
             <% if (!tip.accepted &&
@@ -25,7 +31,7 @@
                 <a href="/quizzes/<%= quizId %>/tips/<%= tip.id %>?_method=DELETE"><button>Borrar</button></a>
 
             <% } %>
-
+            
         </li>
     <% } %>
 </ul>

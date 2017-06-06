@@ -40,7 +40,8 @@ exports.create = function (req, res, next) {
     var tip = models.Tip.build(
         {
             text: req.body.text,
-            QuizId: req.quiz.id
+            QuizId: req.quiz.id,
+            AuthorId: req.session.user.id
         });
 
     tip.save()
