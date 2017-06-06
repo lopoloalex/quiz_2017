@@ -91,6 +91,7 @@ router.get('/users/:userId(\\d+)/quizzes', quizController.index);     // ver las
 
 
 
+
 // Definición de rutas de /quizzes
 router.get('/quizzes',
     quizController.index);
@@ -135,5 +136,7 @@ router.delete('/quizzes/:quizId(\\d+)/tips/:tipId(\\d+)',
     sessionController.loginRequired,
     tipController.destroy);
 
+router.get('/quizzes/randomplay',          quizController.random);
+router.get('/quizzes/randomcheck/:quizId(\\d+)', quizController.randomCheck);
 
 module.exports = router;
